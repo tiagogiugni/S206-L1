@@ -35,6 +35,12 @@ describe('Criando cenário de teste para o site globalsqa', () => {
 
   })
 
+  it('Caso de teste: Realizar logout com sucesso', () => {
+
+    realizarLogout()
+
+  })
+
 })
 
 function criarUsuario() {
@@ -56,6 +62,19 @@ function criarUsuario() {
   cy.get('.ng-binding').should('contain.text', 'Registration successful')
 
   return userInfo
+
+}
+
+function realizarLogout() {
+
+  let info = criarUsuario()
+    cy.get('#username').type(info[0])
+    cy.get('#password').type(info[1])
+    cy.get('.btn-primary').click()
+    cy.get('h1.ng-binding').should('contain.text', info[0])
+
+    cy.get('.btn').click()
+    cy.get('h2').should('contain.text', 'Login')
 
 }
 
