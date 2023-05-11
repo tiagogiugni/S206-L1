@@ -1,104 +1,67 @@
-describe('Criando cenário de teste para o site globalsqa', () => {
+describe('Criando cenário de teste para o site Amazon', () => {
 
-  it('Caso de teste: Registrando um usuário no site com sucesso', () => {
+  it('Caso de teste: Tentativa de cadastro com uma senha que não atende aos requisitos (falha)', () => {
 
-    criarUsuario()
-
-  })
-
-  it('Caso de teste: Registrando um usuário com falha (faltando senha)', () => {
-
-    cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/register')
-    cy.get('#firstName').type('Tiago')
-    cy.get('#Text1').type('Giugni')
-    cy.get('#username').type('tiagogiugni')
-    cy.get('#password').type('abc123')
-    cy.get('#password').clear()
-    cy.get('.has-error > .help-block').should('have.text', 'Password is required')
-    cy.get('.btn-primary').should('be.disabled')
+    cy.visit('https://www.amazon.com.br/')
+    cy.get('#nav-link-accountList').click()
+    cy.get('#createAccountSubmit').click()
+    cy.get('#ap_customer_name').type('Tiago')
+    cy.get('#ap_email').type('testeS206@teste.com')
+    cy.get('#ap_password').type('12345')
+    cy.get('#ap_password_check').type('12345')
+    cy.get('#continue').click()
+    cy.get('#auth-password-invalid-password-alert > .a-box-inner').should('contain.text', 'Mínimo de 6 caracteres necessários')
 
   })
 
-  it('Caso de teste: Realizando login com sucesso', () => {
+  it('Caso de teste: Verificar se a página pede login ao tentar acessar pedidos e devoluções', () => {
 
-    let info = criarUsuario()
-    cy.get('#username').type(info[0])
-    cy.get('#password').type(info[1])
-    cy.get('.btn-primary').click()
-    cy.get('h1.ng-binding').should('contain.text', info[0])
+    cy.visit('https://www.amazon.com.br')
+    cy.get('#nav-orders').click()
+    cy.get('.a-padding-extra-large > .a-spacing-small').should('contain.text', 'Fazer login')
 
-  })
-
-  it('Caso de teste: Registrando um usuário com falha (faltando primeiro nome)', () => {
-
-    criarUsuarioSemNome()
+    //cy.get('._p13n-zg-banner-landing-page-header_style_zgLandingPageBannerTitleContainer__3pQqv').should('contain.text', 'Nossos vencedores no ranking de vendas nas últimas 24 horas. Atualizado com frequência.')
 
   })
 
-  it('Caso de teste: Realizar logout com sucesso', () => {
+  it('Caso de teste: Realizando uma pesquisa na barra de tarefas e apertando enter', () => {
 
-    realizarLogout()
+    cy.visit('https://www.amazon.com.br/')
+    cy.get('#twotabsearchtextbox').type('Ração prime{enter}')
+    cy.get('.a-color-state').should('contain.text', '"Ração prime"')
+
+  })
+
+  it('Caso de teste: Login com e-mail não existente (falha)', () => {
+
+    cy.visit('https://www.amazon.com.br/')
+    cy.get('#nav-link-accountList').click()
+    cy.get('#ap_email').type('testeS206@teste.com')
+    cy.get('.a-button-inner > #continue').click()
+    cy.get('#auth-error-message-box > .a-box-inner').should('contain.text', 'Houve um problema')
+    cy.get('#auth-error-message-box > .a-box-inner').should('contain.text', 'Não encontramos uma conta associada a este endereço de e-mail')
+
+
+  })
+
+  it('Caso de teste: Adicionando um produto no carrinho com sucesso sem estar logado', () => {
+
+    cy.visit('https://www.amazon.com.br/')
+    cy.get('#twotabsearchtextbox').type('Cama para cachorros{enter}')
+    cy.get('[data-index="3"] > .sg-col-inner > .s-widget-container > [data-component-type="s-impression-logger"] > .s-featured-result-item > .s-card-container > .a-spacing-base > .puis-padding-left-small > .s-title-instructions-style > .a-size-mini > .a-link-normal > .a-size-base-plus').click()
+    cy.get('#add-to-cart-button').click()
+    cy.get('.a-padding-medium').should('contain.text', 'Adicionado ao carrinho')
+
+  })
+
+
+  it('Caso de teste: Verificar se o botão de logo da Amazon está retornando para a URL certa, estando em outra página', () => {
+
+    cy.visit('https://www.amazon.com.br/deals?ref_=nav_cs_gb')
+    cy.get('#nav-logo-sprites').click()
+    cy.url().should('eq', 'https://www.amazon.com.br/ref=nav_logo')
 
   })
 
 })
 
-function criarUsuario() {
-
-  let horas = new Date().getHours().toString();
-  let minutos = new Date().getMinutes().toString();
-  let seg = new Date().getSeconds().toString()
-  let user = horas + minutos + seg + 'Id'
-  let senha = horas + minutos + seg + 'Senha'
-  let userInfo = [user, senha]
-
-  cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/login')
-  cy.get('.btn-link').click()
-  cy.get('#firstName').type(user)
-  cy.get('#Text1').type(user)
-  cy.get('#username').type(user)
-  cy.get('#password').type(senha)
-  cy.get('.btn-primary').click()
-  cy.get('.ng-binding').should('contain.text', 'Registration successful')
-
-  return userInfo
-
-}
-
-function realizarLogout() {
-
-  let info = criarUsuario()
-    cy.get('#username').type(info[0])
-    cy.get('#password').type(info[1])
-    cy.get('.btn-primary').click()
-    cy.get('h1.ng-binding').should('contain.text', info[0])
-
-    cy.get('.btn').click()
-    cy.get('h2').should('contain.text', 'Login')
-
-}
-
-function criarUsuarioSemNome() {
-
-  let hours = new Date().getHours().toString()
-  let minutes = new Date().getMinutes().toString()
-  let seconds = new Date().getSeconds().toString()
-
-  let user = hours + minutes + seconds + 'id'
-
-  let password = hours + minutes + seconds + 'password'
-
-  let userInfo = [user, password]
-
-  cy.visit('https://globalsqa.com/angularJs-protractor/registration-login-example/#/register')
-  cy.get('#firstName').type(user)
-  cy.get('#Text1').type(user)
-  cy.get('#username').type(user)
-  cy.get('#password').type(password)
-  cy.get('#firstName').clear()
-  cy.get('.has-error > .help-block').should('have.text', 'First name is required')
-  cy.get('.btn-primary').should('be.disabled')
-
-  return userInfo
-
-}
