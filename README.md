@@ -6,6 +6,11 @@
 npm i cypress
 ```
 
+> Para abrir o Cypress, execute na linha de comando 
+```
+./node_modules/.bin/cypress open
+```
+
 > Para gerar o relatório de testes, rode o spec pela linha de comando
 ```
 ./node_modules/.bin/cypress run --spec 'cypress/e2e/**/'
