@@ -1,4 +1,4 @@
-Feature: Testando API de Naruto Clássico
+Feature: Testando API de Harry Potter
 
 Background: Executa antes de cada teste
     * def url_base = "https://hp-api.onrender.com/"
